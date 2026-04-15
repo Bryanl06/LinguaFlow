@@ -1,8 +1,14 @@
 import axios from 'axios'
 import { supabase } from './supabaseClient'
 
+// En dev usa el proxy de Vite ('/api' → localhost:3000/api)
+// En producción usa la URL del backend desplegado en Render
+const BASE_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api'
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
 })

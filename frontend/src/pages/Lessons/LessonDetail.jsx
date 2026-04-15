@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useLesson } from '../../hooks'
 import { useAuthStore } from '../../store/authStore'
-import { useTriviaExercises } from '../../hooks/useTriviaExercises'
+import { useTriviaExercises } from '../../hooks/UseTriviaExercises'
 
 const TYPE_INFO = {
     fill_blank: { icon: '✏️', label: 'Completar frase', color: 'bg-purple-900/30 dark:bg-purple-500/15 text-purple-400 dark:text-purple-300' },

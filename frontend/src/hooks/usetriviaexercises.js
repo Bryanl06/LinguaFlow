@@ -8,37 +8,37 @@
  *   const { exercises, loading } = useTriviaExercises('B1', 3)
  * ─────────────────────────────────────────────────────────────
  */
-import { useState, useEffect } from 'react';
-import { fetchExercisesForLevel } from '../services/triviaapi';
+import { useState, useEffect } from 'react'
+import { fetchExercisesForLevel } from '../services/Triviaapi'
 
 export function useTriviaExercises(level = 'A1', amount = 3) {
-    const [exercises, setExercises] = useState([])
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(null)
+  const [exercises, setExercises] = useState([])
+  const [loading,   setLoading]   = useState(false)
+  const [error,     setError]     = useState(null)
 
-    useEffect(() => {
-        if (!level) return
-        let cancelled = false
+  useEffect(() => {
+    if (!level) return
+    let cancelled = false
 
-        setLoading(true)
-        setError(null)
+    setLoading(true)
+    setError(null)
 
-        fetchExercisesForLevel(level, amount)
-            .then(data => {
-                if (!cancelled) {
-                    setExercises(data)
-                    setLoading(false)
-                }
-            })
-            .catch(err => {
-                if (!cancelled) {
-                    setError(err.message)
-                    setLoading(false)
-                }
-            })
+    fetchExercisesForLevel(level, amount)
+      .then(data => {
+        if (!cancelled) {
+          setExercises(data)
+          setLoading(false)
+        }
+      })
+      .catch(err => {
+        if (!cancelled) {
+          setError(err.message)
+          setLoading(false)
+        }
+      })
 
-        return () => { cancelled = true }
-    }, [level, amount])
+    return () => { cancelled = true }
+  }, [level, amount])
 
-    return { exercises, loading, error }
+  return { exercises, loading, error }
 }

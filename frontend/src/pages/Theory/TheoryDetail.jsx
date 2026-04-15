@@ -6,7 +6,7 @@ import { useTheoryTopic, useYouTubeVideos } from '../../hooks'
 import AudioPlayer from '../../components/audio/AudioPlayer'
 import VoicePanel from '../../components/audio/VoicePanel'
 import GrammarChecker from '../../components/theory/GrammarChecker'
-import YouTubePlayer from '../../components/video/YouTubePlayer'
+import YouTubePlayer from '../../components/video/YoutubePlayer'
 
 const LEVEL_COLORS = {
     A1: 'bg-green-900/30 dark:bg-green-500/15 text-green-400 dark:text-green-300',

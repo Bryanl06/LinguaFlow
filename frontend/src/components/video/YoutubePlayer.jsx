@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion'
  *   startAt   — Segundo en el que empieza (default: 0)
  *   compact   — Versión mini con thumbnail pequeño
  */
-export default function YouTubePlayer({ videoId, title = 'Video', startAt = 0, compact = false }) {
+export default function YoutubePlayer({ videoId, title = 'Video', startAt = 0, compact = false }) {
     const [active, setActive] = useState(false)
     const ref = useRef(null)
 

@@ -14,7 +14,7 @@ import Profile from './pages/Profile/Profile'
 import ReviewSession from './pages/Exercises/ReviewSession'
 import TheoryList from './pages/Theory/TheoryList'
 import TheoryDetail from './pages/Theory/TheoryDetail'
-import Layout from './components/layout/Layout'
+import Layout from './components/Layout/Layout'
 
 function AuthLoader() {
   return (

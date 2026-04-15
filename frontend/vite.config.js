@@ -8,7 +8,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target:       'http://localhost:3000',
+        target: 'http://localhost:3000',
         changeOrigin: true,
         // Cabeceras de seguridad en desarrollo
         configure: (proxy) => {
@@ -20,11 +20,11 @@ export default defineConfig({
     },
     // Cabeceras de seguridad para el servidor de desarrollo
     headers: {
-      'X-Frame-Options':           'DENY',
-      'X-Content-Type-Options':    'nosniff',
-      'Referrer-Policy':           'strict-origin-when-cross-origin',
-      'Permissions-Policy':        'camera=(), microphone=(self), geolocation=()',
-      'Content-Security-Policy':   [
+      'X-Frame-Options': 'DENY',
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Permissions-Policy': 'camera=(), microphone=(self), geolocation=()',
+      'Content-Security-Policy': [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'",  // unsafe-eval necesario para Vite HMR en dev
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
@@ -46,13 +46,16 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Separar vendors para mejor caché
-        manualChunks: {
-          react:    ['react', 'react-dom'],
-          router:   ['react-router-dom'],
-          query:    ['@tanstack/react-query'],
-          charts:   ['recharts'],
-          motion:   ['framer-motion'],
-          supabase: ['@supabase/supabase-js'],
+        // Vite 8 / Rollup 4: manualChunks debe ser una función, no un objeto
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react-dom') || id.includes('react/')) return 'react'
+            if (id.includes('react-router')) return 'router'
+            if (id.includes('@tanstack/react-query')) return 'query'
+            if (id.includes('recharts') || id.includes('d3-')) return 'charts'
+            if (id.includes('framer-motion')) return 'motion'
+            if (id.includes('@supabase')) return 'supabase'
+          }
         },
       },
     },

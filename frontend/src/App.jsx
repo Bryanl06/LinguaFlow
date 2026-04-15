@@ -1,161 +1,109 @@
-import 'dotenv/config'
-import express   from 'express'
-import cors      from 'cors'
-import helmet    from 'helmet'
-import hpp       from 'hpp'
-import rateLimit from 'express-rate-limit'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useAuthStore } from './store/authStore'
+import { supabase } from './services/supabaseClient'
 
-import authRoutes         from './routes/auth.routes.js'
-import usersRoutes        from './routes/users.routes.js'
-import lessonsRoutes      from './routes/lessons.routes.js'
-import exercisesRoutes    from './routes/exercises.routes.js'
-import progressRoutes     from './routes/progress.routes.js'
-import statsRoutes        from './routes/stats.routes.js'
-import achievementsRoutes from './routes/achievements.routes.js'
-import theoryRoutes       from './routes/theory.routes.js'
-import ttsRoutes          from './routes/tts.routes.js'
+import Home from './pages/Home'
+import Login from './pages/Auth/Login'
+import Register from './pages/Auth/Register'
+import Dashboard from './pages/Dashboard'
+import LessonList from './pages/Lessons/LessonList'
+import LessonDetail from './pages/Lessons/LessonDetail'
+import ExerciseRunner from './pages/Exercises/ExerciseRunner'
+import Profile from './pages/Profile/Profile'
+import ReviewSession from './pages/Exercises/ReviewSession'
+import TheoryList from './pages/Theory/TheoryList'
+import TheoryDetail from './pages/Theory/TheoryDetail'
+import Layout from './components/layout/Layout'
 
-// ── Variables de entorno obligatorias ─────────────────────────────────────────
-const REQUIRED_ENV = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY']
-for (const key of REQUIRED_ENV) {
-  if (!process.env[key]) {
-    console.error(`[FATAL] Variable de entorno faltante: ${key}`)
-    process.exit(1)
-  }
+function AuthLoader() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#0f1117]">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-10 h-10 border-4 border-brand-200 border-t-brand-500 rounded-full animate-spin" />
+        <p className="text-sm text-[#64748b] font-medium">Cargando sesión...</p>
+      </div>
+    </div>
+  )
 }
 
-const app  = express()
-const PORT = process.env.PORT || 3000
-// Orígenes permitidos: localhost en dev + URL de Vercel en producción
-// FRONTEND_URL puede ser una lista separada por comas si se necesita
-const ALLOWED_ORIGINS = new Set([
-  'http://localhost:5173',
-  'http://localhost:4173',  // vite preview
-  ...(process.env.FRONTEND_URL
-    ? process.env.FRONTEND_URL.split(',').map(u => u.trim())
-    : []),
-])
+function PrivateRoute({ children }) {
+  const user = useAuthStore(s => s.user)
+  const isRestoring = useAuthStore(s => s.isRestoring)
+  if (isRestoring) return <AuthLoader />
+  return user ? children : <Navigate to="/login" replace />
+}
 
-// ── Seguridad: Helmet (cabeceras HTTP) ────────────────────────────────────────
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc:     ["'self'"],
-      scriptSrc:      ["'self'"],
-      styleSrc:       ["'self'", "'unsafe-inline'"],
-      imgSrc:         ["'self'", 'data:', 'https:'],
-      connectSrc:     ["'self'", 'https://*.supabase.co'],
-      fontSrc:        ["'self'", 'https://fonts.gstatic.com'],
-      objectSrc:      ["'none'"],
-      upgradeInsecureRequests: [],
-    },
-  },
-  crossOriginEmbedderPolicy: false,  // necesario para audio/video embebido
-  hsts: {
-    maxAge:            31536000,
-    includeSubDomains: true,
-    preload:           true,
-  },
-}))
+function PublicRoute({ children }) {
+  const user = useAuthStore(s => s.user)
+  const isRestoring = useAuthStore(s => s.isRestoring)
+  if (isRestoring) return <AuthLoader />
+  return !user ? children : <Navigate to="/dashboard" replace />
+}
 
-// ── Seguridad: CORS estricto ──────────────────────────────────────────────────
-app.use(cors({
-  origin: (origin, cb) => {
-    // Permitir peticiones sin origen (Postman, scripts locales en dev)
-    if (!origin || origin === ALLOWED_ORIGIN) return cb(null, true)
-    cb(new Error(`CORS: origen no permitido → ${origin}`))
-  },
-  credentials:     true,
-  methods:         ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders:  ['Content-Type', 'Authorization'],
-  exposedHeaders:  ['X-TTS-Engine'],
-  maxAge:          600,  // preflight cache 10 min
-}))
+export default function App() {
+  const { setUser, setSession, setProfile, setIsRestoring, initDarkMode } = useAuthStore()
 
-// ── Seguridad: HTTP Parameter Pollution ──────────────────────────────────────
-app.use(hpp())
+  // Aplicar dark mode guardado en cuanto monta la app
+  useEffect(() => { initDarkMode() }, [])
 
-// ── Rate limiting global + por ruta sensible ──────────────────────────────────
-const globalLimiter = rateLimit({
-  windowMs:        15 * 60 * 1000,  // 15 min
-  max:             200,
-  standardHeaders: true,
-  legacyHeaders:   false,
-  message:         { error: 'Demasiadas peticiones. Inténtalo en 15 minutos.' },
-  skip: (req) => req.path === '/api/health',
-})
+  useEffect(() => {
+    /**
+     * onAuthStateChange es la fuente de verdad.
+     * Se dispara:
+     *  - Al cargar la app (con la sesión guardada en localStorage por Supabase)
+     *  - Tras signInWithPassword (login directo con SDK)
+     *  - Tras signOut
+     *  - Cuando el token se renueva automáticamente
+     *
+     * Como el login ahora usa el SDK directamente (no el backend),
+     * este listener siempre tiene la sesión actualizada.
+     */
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setUser(session?.user ?? null)
+        setSession(session ?? null)
 
-// Auth: límite más estricto para prevenir fuerza bruta
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max:      20,
-  message:  { error: 'Demasiados intentos de autenticación. Espera 15 minutos.' },
-  standardHeaders: true,
-  legacyHeaders:   false,
-})
+        if (!session) {
+          setProfile(null)
+        }
 
-// TTS: limitar para no abusar de los proxies externos
-const ttsLimiter = rateLimit({
-  windowMs: 60 * 1000,  // 1 min
-  max:      30,
-  message:  { error: 'Demasiadas peticiones de audio. Espera un momento.' },
-  standardHeaders: true,
-  legacyHeaders:   false,
-})
+        // Marcar la restauración como completada en cualquier evento
+        setIsRestoring(false)
+      }
+    )
 
-app.use(globalLimiter)
-app.use('/api/auth',  authLimiter)
-app.use('/api/tts',   ttsLimiter)
+    // Timeout de seguridad: si onAuthStateChange no dispara en 3s
+    // (caso extremo), liberar el bloqueo igualmente
+    const timeout = setTimeout(() => setIsRestoring(false), 3000)
 
-// ── Parsers con límites de tamaño (previene DoS) ──────────────────────────────
-app.use(express.json({ limit: '50kb' }))
-app.use(express.urlencoded({ extended: false, limit: '50kb' }))
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeout)
+    }
+  }, [setUser, setSession, setProfile, setIsRestoring])
 
-// ── Eliminar cabecera X-Powered-By (no revelar stack) ────────────────────────
-app.disable('x-powered-by')
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
 
-// ── Rutas ─────────────────────────────────────────────────────────────────────
-app.use('/api/auth',         authRoutes)
-app.use('/api/users',        usersRoutes)
-app.use('/api/lessons',      lessonsRoutes)
-app.use('/api/exercises',    exercisesRoutes)
-app.use('/api/progress',     progressRoutes)
-app.use('/api/stats',        statsRoutes)
-app.use('/api/achievements', achievementsRoutes)
-app.use('/api/theory',       theoryRoutes)
-app.use('/api/tts',          ttsRoutes)
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
 
-// ── Health check ──────────────────────────────────────────────────────────────
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() })
-})
+        <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/lessons" element={<LessonList />} />
+          <Route path="/lessons/:id" element={<LessonDetail />} />
+          <Route path="/exercise/:id" element={<ExerciseRunner />} />
+          <Route path="/review" element={<ReviewSession />} />
+          <Route path="/theory" element={<TheoryList />} />
+          <Route path="/theory/:slug" element={<TheoryDetail />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
 
-// ── 404 ───────────────────────────────────────────────────────────────────────
-app.use((_req, res) => {
-  res.status(404).json({ error: 'Ruta no encontrada' })
-})
-
-// ── Error handler global ──────────────────────────────────────────────────────
-// IMPORTANTE: nunca exponer stack traces ni mensajes internos al cliente
-app.use((err, _req, res, _next) => {
-  // Solo loguear internamente
-  console.error('[Error]', err.message)
-
-  // CORS error
-  if (err.message?.startsWith('CORS')) {
-    return res.status(403).json({ error: 'Acceso no permitido' })
-  }
-
-  // No exponer detalles en producción
-  const isProd = process.env.NODE_ENV === 'production'
-  res.status(err.status || 500).json({
-    error: isProd ? 'Error interno del servidor' : (err.message || 'Error interno'),
-  })
-})
-
-app.listen(PORT, () => {
-  console.log(`✅ Servidor en http://localhost:${PORT}`)
-  console.log(`🌍 Origen CORS permitido: ${ALLOWED_ORIGIN}`)
-})
-
-export default app
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}

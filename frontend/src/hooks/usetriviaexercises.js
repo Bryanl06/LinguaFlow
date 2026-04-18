@@ -1,15 +1,5 @@
-/**
- * useTriviaExercises.js
- * ─────────────────────────────────────────────────────────────
- * Hook que carga ejercicios extra desde Open Trivia DB
- * para enriquecer una lección con preguntas dinámicas.
- *
- * Uso:
- *   const { exercises, loading } = useTriviaExercises('B1', 3)
- * ─────────────────────────────────────────────────────────────
- */
 import { useState, useEffect } from 'react'
-import { fetchExercisesForLevel } from '../services/triviaapi'
+import { fetchExercisesForLevel } from '../services/triviaApi'
 
 export function useTriviaExercises(level = 'A1', amount = 3) {
   const [exercises, setExercises] = useState([])

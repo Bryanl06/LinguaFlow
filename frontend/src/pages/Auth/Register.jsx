@@ -69,11 +69,11 @@ export default function Register() {
     const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }))
 
     /* ── Paleta según modo ── */
-    const bg2 = darkMode ? 'rgba(15,14,32,0.90)' : 'rgba(248,246,255,0.90)'
-    const border = darkMode ? 'rgba(124,58,237,0.30)' : 'rgba(174,150,255,0.50)'
-    const txt = darkMode ? '#e8e4ff' : '#1e1040'
-    const txt2 = darkMode ? '#a89fd4' : '#4a3d8a'
-    const txt3 = darkMode ? '#6b619e' : '#7c6faa'
+    const bg2 = darkMode ? 'rgba(15,14,32,0.90)' : 'rgba(22,27,39,0.95)'
+    const border = darkMode ? 'rgba(124,58,237,0.30)' : 'rgba(99,102,241,0.25)'
+    const txt = darkMode ? '#e8e4ff' : '#e2e8f0'
+    const txt2 = darkMode ? '#a89fd4' : '#94a3b8'
+    const txt3 = darkMode ? '#6b619e' : '#64748b'
 
     return (
         <div className="min-h-screen flex items-center justify-center px-4 py-10
@@ -81,7 +81,7 @@ export default function Register() {
             style={{
                 background: darkMode
                     ? 'linear-gradient(160deg,#07060f 0%,#0a0919 50%,#0f0e20 100%)'
-                    : 'linear-gradient(160deg,#f4f2ff 0%,#ede9ff 50%,#eef2ff 100%)'
+                    : 'linear-gradient(160deg,#0f1117 0%,#131620 50%,#0f1117 100%)'
             }}>
 
             {/* Blobs */}
@@ -90,19 +90,19 @@ export default function Register() {
                     style={{
                         background: darkMode
                             ? 'radial-gradient(circle,rgba(41,121,255,0.18),transparent 70%)'
-                            : 'radial-gradient(circle,rgba(41,121,255,0.10),transparent 70%)'
+                            : 'radial-gradient(circle,rgba(34,211,238,0.18),transparent 70%)'
                     }} />
                 <div className="absolute bottom-10 left-1/4 w-72 h-72 rounded-full blur-3xl"
                     style={{
                         background: darkMode
                             ? 'radial-gradient(circle,rgba(124,58,237,0.15),transparent 70%)'
-                            : 'radial-gradient(circle,rgba(124,58,237,0.08),transparent 70%)'
+                            : 'radial-gradient(circle,rgba(139,92,246,0.20),transparent 70%)'
                     }} />
                 <div className="absolute top-1/2 right-10 w-48 h-48 rounded-full blur-3xl"
                     style={{
                         background: darkMode
                             ? 'radial-gradient(circle,rgba(6,182,212,0.10),transparent 70%)'
-                            : 'radial-gradient(circle,rgba(6,182,212,0.06),transparent 70%)'
+                            : 'radial-gradient(circle,rgba(6,182,212,0.15),transparent 70%)'
                     }} />
             </div>
 
@@ -112,7 +112,7 @@ export default function Register() {
                    justify-center text-lg hover:scale-105 transition-all"
                 style={{
                     background: bg2, border: `1px solid ${border}`,
-                    boxShadow: darkMode ? '0 4px 20px rgba(124,58,237,0.20)' : '0 2px 12px rgba(124,58,237,0.12)'
+                    boxShadow: darkMode ? '0 4px 20px rgba(124,58,237,0.20)' : '0 4px 20px rgba(0,0,0,0.35)'
                 }}
                 aria-label="Cambiar tema">
                 {darkMode ? '☀️' : '🌙'}
@@ -127,7 +127,7 @@ export default function Register() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link to="/" className="font-display text-3xl font-extrabold"
-                        style={{ color: darkMode ? '#ae96ff' : '#7c3aed' }}>
+                        style={{ color: darkMode ? '#ae96ff' : '#a5b4fc' }}>
                         Lingua<span className="text-accent-500">Flow</span>
                     </Link>
                     <p className="mt-2 text-sm" style={{ color: txt2 }}>Crea tu cuenta — es gratis 🚀</p>
@@ -139,7 +139,7 @@ export default function Register() {
                         background: bg2, border: `1px solid ${border}`,
                         boxShadow: darkMode
                             ? '0 8px 40px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 0 1px rgba(124,58,237,0.10)'
-                            : '0 8px 40px rgba(124,58,237,0.12), inset 0 1px 0 rgba(255,255,255,0.90)',
+                            : '0 8px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04), 0 0 0 1px rgba(99,102,241,0.12)',
                         backdropFilter: 'blur(20px)'
                     }}>
 
@@ -202,7 +202,7 @@ export default function Register() {
                     <p className="text-center text-sm mt-3" style={{ color: txt3 }}>
                         ¿Ya tienes cuenta?{' '}
                         <Link to="/login" className="font-semibold hover:underline"
-                            style={{ color: darkMode ? '#ae96ff' : '#7c3aed' }}>
+                            style={{ color: darkMode ? '#ae96ff' : '#a5b4fc' }}>
                             Iniciar sesión
                         </Link>
                     </p>

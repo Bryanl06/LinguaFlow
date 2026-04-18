@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { fetchExercisesForLevel } from '../services/triviaApi'
+import { fetchExercisesForLevel } from '../services/triviaapi'
 
 export function useTriviaExercises(level = 'A1', amount = 3) {
   const [exercises, setExercises] = useState([])

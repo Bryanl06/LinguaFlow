@@ -245,7 +245,7 @@ export default function LessonDetail() {
                 )}
             </motion.div>
 
-            {/* ── Ejercicios bonus (Open Trivia DB) ── */}
+            {/* ── Preguntas extra — práctica rápida ── */}
             {(triviaLoading || triviaExs.length > 0) && (
                 <motion.div
                     initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
@@ -253,16 +253,15 @@ export default function LessonDetail() {
                     className="card"
                 >
                     <div className="flex items-center gap-2 mb-3">
-                        <span className="text-lg">🎲</span>
+                        <span className="text-lg">✨</span>
                         <h2 className="font-display font-bold text-base"
                             style={{ color: 'var(--c-text)' }}>
-                            Bonus — Trivia de conocimiento general
+                            Unas preguntas extra para calentar
                         </h2>
-                        <span className="chip-neon ml-auto">Dinámico</span>
                     </div>
                     <p className="text-xs mb-4" style={{ color: 'var(--c-text-3)' }}>
-                        Preguntas extra cargadas en tiempo real desde Open Trivia DB para
-                        practicar vocabulario y comprensión en inglés.
+                        Antes de empezar la lección, échale un vistazo a estas preguntas
+                        de tu nivel — te servirán para ponerte en modo inglés.
                     </p>
                     {triviaLoading ? (
                         <div className="space-y-2">

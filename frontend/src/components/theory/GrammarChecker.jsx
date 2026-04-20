@@ -39,17 +39,11 @@ export default function GrammarChecker() {
                     style={{ color: 'var(--c-text)' }}>
                     <span>🔍</span> Comprobador de gramática
                 </h2>
-                <span className="text-xs px-2 py-1 rounded-lg"
-                    style={{
-                        background: 'var(--c-surface-alt)', color: 'var(--c-text-3)',
-                        border: '1px solid var(--c-border)'
-                    }}>
-                    LanguageTool · Gratis
-                </span>
             </div>
 
             <p className="text-sm" style={{ color: 'var(--c-text-3)' }}>
-                Escribe una frase en inglés y comprueba si tiene errores gramaticales.
+                Escribe una frase en inglés y te diré si hay algo que mejorar. Te aviso
+                de errores de gramática, de ortografía y de palabras mal usadas.
             </p>
 
             {/* Textarea */}

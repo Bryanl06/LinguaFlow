@@ -1,3 +1,7 @@
+/**
+ * Carga preguntas extra de inglés adaptadas al nivel CEFR de la lección.
+ * Sirven como pequeño calentamiento antes de empezar los ejercicios oficiales.
+ */
 import { useState, useEffect } from 'react'
 import { fetchExercisesForLevel } from '../services/triviaapi'
 
